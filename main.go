@@ -16,9 +16,8 @@ package main
 import (
 	"os"
 
-	"github.com/aws/amazon-ecs-cni-plugins/pkg/logger"
-
 	"github.com/aws/amazon-vpc-cni-k8s/ipamd"
+	"github.com/aws/amazon-vpc-cni-k8s/pkg/logger"
 	log "github.com/cihub/seelog"
 )
 

@@ -1,4 +1,4 @@
-// Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"). You may
 // not use this file except in compliance with the License. A copy of the
@@ -13,7 +13,6 @@
 
 package utils
 
-//TODO needs to extract this to library (it's copied from ecs agent)
 import (
 	"math"
 	"math/rand"
@@ -21,11 +20,13 @@ import (
 	"time"
 )
 
+// Backoff defines the interface for a backoff
 type Backoff interface {
 	Reset()
 	Duration() time.Duration
 }
 
+// SimpleBackoff implements a simple mechanism for backoff
 type SimpleBackoff struct {
 	current        time.Duration
 	start          time.Duration
@@ -52,6 +53,7 @@ func NewSimpleBackoff(min, max time.Duration, jitterMultiple, multiple float64) 
 	}
 }
 
+// Duration returns the time a backoff should wait
 func (sb *SimpleBackoff) Duration() time.Duration {
 	sb.mu.Lock()
 	defer sb.mu.Unlock()
@@ -61,6 +63,7 @@ func (sb *SimpleBackoff) Duration() time.Duration {
 	return AddJitter(ret, time.Duration(int64(float64(ret)*sb.jitterMultiple)))
 }
 
+// Reset sets backoff to its initial status
 func (sb *SimpleBackoff) Reset() {
 	sb.mu.Lock()
 	defer sb.mu.Unlock()

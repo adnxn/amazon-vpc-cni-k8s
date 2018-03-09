@@ -1,4 +1,4 @@
-// Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License"). You may
 // not use this file except in compliance with the License. A copy of the
@@ -13,78 +13,44 @@
 
 package utils
 
-import (
-	"fmt"
-	"strings"
-)
-
+// Retriable definies the interface for retriable object
 type Retriable interface {
 	Retry() bool
 }
 
+// DefaultRetriable is a simple struct that implements the Retriable
 type DefaultRetriable struct {
 	retry bool
 }
 
+// Retry returns whether should retry or not
 func (dr DefaultRetriable) Retry() bool {
 	return dr.retry
 }
 
+// NewRetriable creates a simple Retriable object
 func NewRetriable(retry bool) Retriable {
 	return DefaultRetriable{
 		retry: retry,
 	}
 }
 
+// RetriableError definies the interface for retriable error
 type RetriableError interface {
 	Retriable
 	error
 }
 
+// DefaultRetriableError is a simple struct that implements the RetriableError
 type DefaultRetriableError struct {
 	Retriable
 	error
 }
 
+// NewRetriableError creates a simple RetriableError object
 func NewRetriableError(retriable Retriable, err error) RetriableError {
 	return &DefaultRetriableError{
 		retriable,
 		err,
 	}
-}
-
-type AttributeError struct {
-	err string
-}
-
-func (e AttributeError) Error() string {
-	return e.err
-}
-
-func NewAttributeError(err string) AttributeError {
-	return AttributeError{err}
-}
-
-// Implements error
-type MultiErr struct {
-	errors []error
-}
-
-func (me MultiErr) Error() string {
-	ret := make([]string, len(me.errors)+1)
-	ret[0] = "Multiple error:"
-	for ndx, err := range me.errors {
-		ret[ndx+1] = fmt.Sprintf("\t%d: %s", ndx, err.Error())
-	}
-	return strings.Join(ret, "\n")
-}
-
-func NewMultiError(errs ...error) error {
-	errors := make([]error, 0, len(errs))
-	for _, err := range errs {
-		if err != nil {
-			errors = append(errors, err)
-		}
-	}
-	return MultiErr{errors}
 }
